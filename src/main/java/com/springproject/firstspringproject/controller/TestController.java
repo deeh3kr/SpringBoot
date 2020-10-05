@@ -1,6 +1,10 @@
 package com.springproject.firstspringproject.controller;
 
 import java.util.List;
+import java.util.Optional;
+
+import com.springproject.firstspringproject.entities.Book;
+import com.springproject.firstspringproject.services.BookService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,76 +18,96 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import javassist.bytecode.stackmap.BasicBlock.Catch;
 
 
-import com.springproject.firstspringproject.entities.Course;
-//import com.springproject.firstspringproject.services.CourseService;
-
-
-
-@Controller
+@RestController
 public class TestController {
-	
+
 	@Autowired
-//	private CourseService courseService;
-	
-	@RequestMapping("/")
-	public String homehandler()
+	private BookService bookService;
+
+	@GetMapping("/books")
+	// public List<Book> getBooks()
+	public ResponseEntity<List<Book> > getBooks()
 	{
-		System.out.println("Home Page");
-		return "home";
+		// Book book = new Book();
+		// book.setId(1);
+		// book.setAuthor("Deepanshu");
+		// book.setTitle("Java");
+		// return book;
+
+		List<Book> list = this.bookService.getAllBooks();
+		if(list.size() <= 0)
+		{
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
+
+		return ResponseEntity.status(HttpStatus.CREATED).body(list);
+
 	}
-	
-	@RequestMapping("/contact")
-	public String contact()
+
+	@GetMapping("/books/{id}")
+	public ResponseEntity<Book> getBook(@PathVariable("id") int id)
 	{
-		System.out.println("Contact Page");
-		return "contact";
+		Book book = null;
+		try{
+			book = this.bookService.getSingleBook(id);
+			return ResponseEntity.of(Optional.of(book));
+		}
+		catch(Exception e){
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
+		
+		
 	}
-	
-	@RequestMapping("/test")
-	@ResponseBody
-	public String handler()
+
+	@PostMapping("/books")
+	public ResponseEntity<Book> addBook(@RequestBody Book b)
 	{
-		return "First Handler";
+		Book book = null;
+		try{
+			book = this.bookService.addBook(b);
+			return ResponseEntity.of(Optional.of(book));
+		}
+		catch(Exception e){
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
+
+		
 	}
-	
-	//---------------------------------------------
-	
-//	@GetMapping("/courses")
-//	public List<Course> getCourses()
-//	{
-//		return this.courseService.getCourses();
-//	}
-//	
-//	@GetMapping("/courses/{courseId}")
-//	public Course getCourse(@PathVariable String courseId) {
-//		return this.courseService.getCourse(Long.parseLong(courseId));
-//	}
-//	
-//	@PostMapping("/courses")
-//	public Course addCourse(@RequestBody Course course)
-//	{
-//		return this.courseService.addCourse(course);
-//	}
-//	
-//	@PutMapping("/courses")
-//	public Course updateCourse(@RequestBody Course course)
-//	{
-//		return this.courseService.updateCourse(course);
-//	}
-//	
-//	@DeleteMapping("/courses/{courseId}")
-//	public ResponseEntity<HttpStatus> deleteCourse(@PathVariable String courseId)
-//	{
-//		try {
-//			this.courseService.deleteCourse(Long.parseLong(courseId));
-//			return new ResponseEntity<>(HttpStatus.OK);
-//		} catch (Exception e){
-//			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-//		}
-//	}
-	
+
+	@DeleteMapping("/books/{id}")
+	public ResponseEntity<Void> deleteBook(@PathVariable("id") int id)
+	{
+		try{
+			this.bookService.deleteBook(id);
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
+	}
+
+	@PutMapping("/books/{id}")
+	public ResponseEntity<Book> updateBook(@RequestBody Book book, @PathVariable("id") int id)
+	{
+		Book b = null;
+		try{
+			b = this.bookService.updateBook(book, id);
+			return ResponseEntity.of(Optional.of(b));
+		}catch(Exception e)
+		{
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
+		
+	}
 
 
 }
