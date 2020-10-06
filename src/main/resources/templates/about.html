@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>About page</h1>
+    <p th:text="${ #strings.toUpperCase(name) }"></p>
+    <p th:text="${CurrentDate}"></p>
+
+    <div th:with="a=5, b=6, n=${name}">
+        <p>a is: <span th:text="${a}"></span></p>
+        <p th:text="'Value of B is: ' + ${b}"></p>
+    </div>
+
+    <p>Iterate through List</p>
+    <ul>
+        <li th:each="n, status : ${listName}"> <span th:style="${status.odd} ? 'font-weight: bold' : ' ' " th:text="${status.index}+' ' + ${n}"></span></li>
+    </ul>
+    
+</body>
+</html>
